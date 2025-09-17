@@ -74,7 +74,6 @@ jobs:
     if: needs.validate.outputs.should-deploy == 'true'
     environment: 
       name: production
-      url: https://${{ secrets.DOMAIN_NAME }}
     
     steps:
       - name: Checkout code
@@ -136,8 +135,6 @@ jobs:
 
       - name: Get deployment outputs
         working-directory: ./cdk
-        env:
-          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
         run: |
           echo "## 🚀 Deployment Results" >> $GITHUB_STEP_SUMMARY
           
