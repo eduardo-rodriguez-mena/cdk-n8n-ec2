@@ -1,0 +1,35 @@
+{
+  "name": "n8n-aws-deployment",
+  "version": "1.0.0",
+  "description": "AWS CDK deployment for n8n workflow automation platform",
+  "private": true,
+  "scripts": {
+    "build": "cd cdk && npm run build",
+    "deploy": "cd cdk && npm run deploy", 
+    "destroy": "cd cdk && npm run destroy",
+    "diff": "cd cdk && npm run diff",
+    "synth": "cd cdk && npm run synth",
+    "bootstrap": "cd cdk && npx cdk bootstrap",
+    "install-deps": "cd cdk && npm install"
+  },
+  "keywords": [
+    "n8n",
+    "aws",
+    "cdk",
+    "automation",
+    "workflow",
+    "ec2",
+    "nginx",
+    "ssl",
+    "lets-encrypt"
+  ],
+  "author": "YYO Gestiono",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/n8n-aws-deployment.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
