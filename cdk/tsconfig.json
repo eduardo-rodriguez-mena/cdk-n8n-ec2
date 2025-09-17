@@ -27,10 +27,15 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "lib"
+    "outDir": "./cdk.out",
+    "rootDir": "./",
+    "moduleResolution": "node"
   },
+  "include": [
+    "**/*.ts"
+  ],
   "exclude": [
     "node_modules",
-    "cdk.out"
+    "cdk.out",
+    "**/*.d.ts"
   ]
-}

@@ -13,7 +13,7 @@ new N8nStack(app, 'N8nStack', {
   description: 'n8n workflow automation deployment on AWS EC2',
   tags: {
     Project: 'n8n-aws',
-    Environment: 'poc',
+    Environment: 'PoC',
     ManagedBy: 'CDK'
   }
 });
