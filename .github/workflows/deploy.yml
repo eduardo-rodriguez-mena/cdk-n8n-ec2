@@ -21,7 +21,7 @@ on:
         - diff
 
 env:
-  AWS_REGION: us-east-1
+  AWS_REGION: ${{ secrets.AWS_REGION }}
   NODE_VERSION: '18'
 
 jobs:
