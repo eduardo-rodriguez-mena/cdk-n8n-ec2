@@ -19,7 +19,6 @@ cd /home/ec2-user/n8n
 # Create docker-compose.yml with environment variables
 echo "🐳 Creating docker-compose.yml..."
 cat > docker-compose.yml << EOF
-version: '3.8'
 
 services:
   nginx:
@@ -131,7 +130,8 @@ http {
     }
 
     server {
-        listen 443 ssl http2;
+        listen 443 ssl;
+        http2 on;
         server_name $DOMAIN_NAME;
 
         ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
