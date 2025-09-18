@@ -4,6 +4,7 @@ import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
+
 export class N8nStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -58,6 +59,8 @@ export class N8nStack extends cdk.Stack {
       ]
     });
 
+    //
+ 
     // User data script
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
@@ -249,8 +252,14 @@ EOF`,
       `su - ec2-user -c "cd /home/ec2-user/n8n && DOMAIN_NAME=${domainName} ./init-cert.sh"`
     );
 
+    // Create Keypair
+    const key = new ec2.CfnKeyPair(this, 'N8nKey', {
+      keyName: 'n8n-key',
+    });
+
     // Key pair (necesitas crear uno en la consola AWS o usar uno existente)
     const keyName = 'n8n-key'; // Asegúrate de crear esta key pair en AWS Console
+
 
     // EC2 Instance
     const instance = new ec2.Instance(this, 'N8nInstance', {
