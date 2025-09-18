@@ -48,7 +48,7 @@ services:
       - N8N_LOG_LEVEL=info
       - DB_TYPE=sqlite
       - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
-      - DB_SQLITE_POOL_SIZE=1                                                           
+      - DB_SQLITE_POOL_SIZE=1
       - N8N_RUNNERS_ENABLED=true  
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=$N8N_USER
