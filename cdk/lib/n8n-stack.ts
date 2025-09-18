@@ -162,6 +162,8 @@ services:
       - GENERIC_TIMEZONE=America/Mexico_City
       - DB_TYPE=sqlite
       - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
+      - N8N_LOG_LEVEL=info
+      - DB_TYPE=sqlite      
     volumes:
       - /mnt/efs/n8n-data:/home/node/.n8n  # ← CAMBIADO A EFS
     expose:
@@ -215,7 +217,7 @@ http {
         ssl_prefer_server_ciphers off;
 
         location / {
-            proxy_pass https://n8n;
+            proxy_pass http://n8n;
             proxy_set_header Host \\$host;
             proxy_set_header X-Real-IP \\$remote_addr;
             proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;

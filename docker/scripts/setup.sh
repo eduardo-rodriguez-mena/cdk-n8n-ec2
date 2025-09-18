@@ -48,6 +48,8 @@ services:
       - N8N_LOG_LEVEL=info
       - DB_TYPE=sqlite
       - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
+      - N8N_LOG_LEVEL=info
+      - DB_TYPE=sqlite      
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=$N8N_USER
       - N8N_BASIC_AUTH_PASSWORD=$N8N_PASSWORD
