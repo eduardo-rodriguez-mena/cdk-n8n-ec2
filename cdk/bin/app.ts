@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { N8nStack } from '../cdk.out/lib/n8n-stack';
+import { N8nStack } from '../lib/n8n-stack';
 
 const app = new cdk.App();
 

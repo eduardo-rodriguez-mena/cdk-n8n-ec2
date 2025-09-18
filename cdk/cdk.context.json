@@ -1,0 +1,14 @@
+{
+  "hosted-zone:account=008035278176:domainName=aws.yyogestiono.com:region=us-east-1": {
+    "Id": "/hostedzone/Z0746618201BJEPTS5RK0",
+    "Name": "aws.yyogestiono.com."
+  },
+  "availability-zones:account=008035278176:region=us-east-1": [
+    "us-east-1a",
+    "us-east-1b",
+    "us-east-1c",
+    "us-east-1d",
+    "us-east-1e",
+    "us-east-1f"
+  ]
+}
