@@ -7,7 +7,7 @@ const app = new cdk.App();
 
 new N8nStack(app, 'N8nStack', {
   env: {
-    account: process.env.AWS_ACCOUNT_ID,
+    account: process.env.AWS_ACCOUNT_ID || '008035278176',
     region: process.env.AWS_REGION || 'us-east-1',
   },
   description: 'n8n workflow automation deployment on AWS EC2',
