@@ -162,8 +162,8 @@ services:
       - GENERIC_TIMEZONE=America/Mexico_City
       - DB_TYPE=sqlite
       - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
-      - N8N_LOG_LEVEL=info
-      - DB_TYPE=sqlite      
+      - DB_SQLITE_POOL_SIZE=1                                                           
+      - N8N_RUNNERS_ENABLED=true
     volumes:
       - /mnt/efs/n8n-data:/home/node/.n8n  # ← CAMBIADO A EFS
     expose:
