@@ -1,5 +1,7 @@
+import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as efs from 'aws-cdk-lib/aws-efs';  // ← ESTE IMPORT FALTA
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
@@ -30,12 +32,35 @@ export class N8nStack extends cdk.Stack {
       ]
     });
 
-    // Security Group
+    // Create EFS for persistent storage ← ESTO ES NUEVO
+    const fileSystem = new efs.FileSystem(this, 'N8nEFS', {
+      vpc: vpc,
+      lifecyclePolicy: efs.LifecyclePolicy.AFTER_30_DAYS,
+      performanceMode: efs.PerformanceMode.GENERAL_PURPOSE,
+      throughputMode: efs.ThroughputMode.BURSTING,
+      removalPolicy: cdk.RemovalPolicy.DESTROY
+    });
+
+    // Security Group for EFS ← ESTO ES NUEVO
+    const efsSecurityGroup = new ec2.SecurityGroup(this, 'EfsSecurityGroup', {
+      vpc,
+      description: 'Security group for EFS',
+      allowAllOutbound: false
+    });
+
+    // Security Group for EC2
     const securityGroup = new ec2.SecurityGroup(this, 'N8nSecurityGroup', {
       vpc,
       description: 'Security group for n8n EC2 instance',
       allowAllOutbound: true
     });
+
+    // Allow EFS access from EC2 ← ESTO ES NUEVO
+    efsSecurityGroup.addIngressRule(
+      securityGroup,
+      ec2.Port.tcp(2049),
+      'Allow NFS access from EC2'
+    );
 
     // Allow HTTPS traffic
     securityGroup.addIngressRule(
@@ -58,22 +83,30 @@ export class N8nStack extends cdk.Stack {
       'Allow SSH access'
     );
 
-    // IAM role for EC2
+    // Create EFS Access Point ← ESTO ES NUEVO
+    fileSystem.addAccessPoint('N8nAccessPoint', {
+        path: '/n8n-data',
+        posixUser: {
+            gid: '1000',
+            uid: '1000'
+        }
+    });
+
+    // IAM role for EC2 (ACTUALIZADO con permisos EFS)
     const ec2Role = new iam.Role(this, 'N8nEc2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
       managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy')
+        iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonElasticFileSystemClientFullAccess') // ← NUEVO
       ]
     });
 
-    //
- 
-    // User data script
+    // User data script (ACTUALIZADO con montaje EFS)
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
       '#!/bin/bash',
       'yum update -y',
-      'yum install -y docker',
+      'yum install -y docker amazon-efs-utils', // ← AGREGADO amazon-efs-utils
       'systemctl start docker',
       'systemctl enable docker',
       'usermod -a -G docker ec2-user',
@@ -83,9 +116,15 @@ export class N8nStack extends cdk.Stack {
       'chmod +x /usr/local/bin/docker-compose',
       'ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose',
       
+      // Create and mount EFS ← ESTO ES NUEVO
+      'mkdir -p /mnt/efs',
+      `echo "${fileSystem.fileSystemId}.efs.us-east-1.amazonaws.com:/ /mnt/efs efs defaults,_netdev" >> /etc/fstab`,
+      'mount -a',
+      'mkdir -p /mnt/efs/n8n-data',
+      'chown -R 1000:1000 /mnt/efs/n8n-data',
+      
       // Create directories
       'mkdir -p /home/ec2-user/n8n',
-      'mkdir -p /home/ec2-user/n8n/data',
       'mkdir -p /home/ec2-user/n8n/nginx',
       'mkdir -p /home/ec2-user/n8n/certbot/www',
       'mkdir -p /home/ec2-user/n8n/certbot/conf',
@@ -93,10 +132,8 @@ export class N8nStack extends cdk.Stack {
       // Set permissions
       'chown -R ec2-user:ec2-user /home/ec2-user/n8n',
       
-      // Create docker-compose.yml
+      // Create docker-compose.yml with EFS mount ← ACTUALIZADO
       `cat > /home/ec2-user/n8n/docker-compose.yml << 'EOF'
-version: '3.8'
-
 services:
   nginx:
     image: nginx:alpine
@@ -125,10 +162,11 @@ services:
       - DB_TYPE=sqlite
       - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
     volumes:
-      - ./data:/home/node/.n8n
+      - /mnt/efs/n8n-data:/home/node/.n8n  # ← CAMBIADO A EFS
     expose:
       - "5678"
     restart: unless-stopped
+    user: "1000:1000"
 
   certbot:
     image: certbot/certbot
@@ -164,7 +202,8 @@ http {
     }
 
     server {
-        listen 443 ssl http2;
+        listen 443 ssl;
+        http2 on;
         server_name ${domainName};
 
         ssl_certificate /etc/letsencrypt/live/${domainName}/fullchain.pem;
