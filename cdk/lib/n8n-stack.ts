@@ -37,7 +37,7 @@ export class N8nStack extends cdk.Stack {
       description: 'Security group for EFS',
       allowAllOutbound: false
     });
-    
+
     // Create EFS for persistent storage ← ESTO ES NUEVO
     const fileSystem = new efs.FileSystem(this, 'N8nEFS', {
       vpc: vpc,
@@ -215,7 +215,7 @@ http {
         ssl_prefer_server_ciphers off;
 
         location / {
-            proxy_pass http://n8n;
+            proxy_pass https://n8n;
             proxy_set_header Host \\$host;
             proxy_set_header X-Real-IP \\$remote_addr;
             proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
