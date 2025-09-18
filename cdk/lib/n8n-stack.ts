@@ -38,13 +38,17 @@ export class N8nStack extends cdk.Stack {
       allowAllOutbound: false
     });
 
+
+    // Mantener SG de EFS Volumen aun cuando se destruya Stack
+    efsSecurityGroup.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
+
     // Create EFS for persistent storage ← ESTO ES NUEVO
     const fileSystem = new efs.FileSystem(this, 'N8nEFS', {
       vpc: vpc,
       lifecyclePolicy: efs.LifecyclePolicy.AFTER_30_DAYS,
       performanceMode: efs.PerformanceMode.GENERAL_PURPOSE,
       throughputMode: efs.ThroughputMode.BURSTING,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,   //Mantener Volumen aun cuando se destruya Stack
       securityGroup: efsSecurityGroup
     });
 
@@ -218,21 +222,19 @@ http {
 
         location / {
             proxy_pass http://n8n;
-            proxy_set_header Host \\$host;
-            proxy_set_header X-Real-IP \\$remote_addr;
-            proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto \\$scheme;
-            
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $remote_addr;
+            proxy_set_header X-Forwarded-Proto $scheme;
+    
             # WebSocket support for n8n
             proxy_http_version 1.1;
-            proxy_set_header Upgrade \\$http_upgrade;
-            proxy_set_header Connection "upgrade";
-            
+
             # Timeouts
             proxy_connect_timeout 60s;
             proxy_send_timeout 60s;
             proxy_read_timeout 60s;
         }
+
     }
 }
 EOF`,
