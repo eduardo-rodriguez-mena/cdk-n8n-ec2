@@ -31,21 +31,21 @@ export class N8nStack extends cdk.Stack {
         }
       ]
     });
-
+    // Security Group for EFS
+    const efsSecurityGroup = new ec2.SecurityGroup(this, 'EfsSecurityGroup', {
+      vpc,
+      description: 'Security group for EFS',
+      allowAllOutbound: false
+    });
+    
     // Create EFS for persistent storage ← ESTO ES NUEVO
     const fileSystem = new efs.FileSystem(this, 'N8nEFS', {
       vpc: vpc,
       lifecyclePolicy: efs.LifecyclePolicy.AFTER_30_DAYS,
       performanceMode: efs.PerformanceMode.GENERAL_PURPOSE,
       throughputMode: efs.ThroughputMode.BURSTING,
-      removalPolicy: cdk.RemovalPolicy.DESTROY
-    });
-
-    // Security Group for EFS ← ESTO ES NUEVO
-    const efsSecurityGroup = new ec2.SecurityGroup(this, 'EfsSecurityGroup', {
-      vpc,
-      description: 'Security group for EFS',
-      allowAllOutbound: false
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      securityGroup: efsSecurityGroup
     });
 
     // Security Group for EC2
@@ -55,7 +55,8 @@ export class N8nStack extends cdk.Stack {
       allowAllOutbound: true
     });
 
-    // Allow EFS access from EC2 ← ESTO ES NUEVO
+
+    // Allow EFS access from EC2
     efsSecurityGroup.addIngressRule(
       securityGroup,
       ec2.Port.tcp(2049),
