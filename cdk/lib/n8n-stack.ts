@@ -188,7 +188,7 @@ events {
 
 http {
     upstream n8n {
-        server n8n:5678;
+        server n8n-app:5678;
     }
 
     server {
