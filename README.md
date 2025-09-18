@@ -6,7 +6,8 @@ Automated deployment of n8n workflow automation platform on AWS using CDK and Gi
 ## 🏗️ Architecture
 
 - **Compute**: EC2 t3.nano instance (512MB RAM, 1vCPU)
-- **Storage**: EBS for OS + local SQLite database
+- **Storage**: EBS for OS
+- **Persisten-Storage**: EFS for local SQLite database. Not destroy on stack deletion.
 - **SSL**: Let's Encrypt certificates via Certbot
 - **Proxy**: Nginx reverse proxy
 - **DNS**: Route53 with existing hosted zone
@@ -16,6 +17,7 @@ Automated deployment of n8n workflow automation platform on AWS using CDK and Gi
 
 - EC2 t3.nano: ~$3.76/month
 - EBS 8GB: ~$0.80/month
+- EFS Volume: ~$0.30/month
 - Route53 queries: ~$0.50/month
 - **Total**: ~$5/month
 
