@@ -5,7 +5,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # CDK
-cdk/lib/
 cdk/node_modules/
 cdk.out/
 *.js
