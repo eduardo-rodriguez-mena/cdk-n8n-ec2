@@ -29,6 +29,7 @@ jobs:
   validate:
     name: Validate Code
     runs-on: ubuntu-latest
+    environment: PoC
     outputs:
       should-deploy: ${{ steps.should-deploy.outputs.result }}
     
@@ -75,7 +76,7 @@ jobs:
     needs: validate
     if: needs.validate.outputs.should-deploy == 'true'
     environment: 
-      name: production
+      name: PoC
     
     steps:
       - name: Checkout code
@@ -94,6 +95,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+
 
       - name: Install CDK dependencies
         working-directory: ./cdk
