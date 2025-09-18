@@ -53,7 +53,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
           DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
         run: npm run synth
 
@@ -91,7 +91,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Install CDK dependencies
         working-directory: ./cdk
@@ -103,7 +103,7 @@ jobs:
         working-directory: ./cdk
         run: |
           # Check if bootstrap is needed
-          if ! aws cloudformation describe-stacks --stack-name CDKToolkit --region ${{ env.AWS_REGION }} >/dev/null 2>&1; then
+          if ! aws cloudformation describe-stacks --stack-name CDKToolkit --region ${{ secrets.AWS_REGION }} >/dev/null 2>&1; then
             echo "Bootstrapping CDK..."
             npx cdk bootstrap
           else
@@ -141,7 +141,7 @@ jobs:
           # Get stack outputs
           STACK_OUTPUTS=$(aws cloudformation describe-stacks \
             --stack-name N8nStack \
-            --region ${{ env.AWS_REGION }} \
+            --region ${{ secrets.AWS_REGION }} \
             --query 'Stacks[0].Outputs' \
             --output json 2>/dev/null || echo "[]")
           
